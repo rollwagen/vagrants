@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     apt update
     apt dist-upgrade -y
-    apt install nmap dnsmap -y
+    apt install nmap dnsmap net-tools -y
     apt install -y openvpn dialog python3-pip python3-setuptools
     pip3 install protonvpn-cli
     apt install -y recon-ng
