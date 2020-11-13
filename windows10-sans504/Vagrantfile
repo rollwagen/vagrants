@@ -1,0 +1,29 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# https://docs.vagrantup.com.
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "windows_10"
+
+  config.vm.provider "vmware_desktop" do |vmware|
+    vmware.vmx["displayname"] = "Windows SEC504 lab"
+    vmware.memory = 2048 
+    vmware.cpus = 2
+    vmware.gui = true
+  end
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provision "shell", inline: <<-POWERSHELL
+	Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))	
+
+	choco install -y firefox
+	choco install -y putty
+	choco install -y vscode
+
+	choco install -y netcat
+	choco install -y nmap
+  POWERSHELL
+
+end
