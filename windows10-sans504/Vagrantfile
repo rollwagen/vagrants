@@ -24,6 +24,7 @@ Vagrant.configure("2") do |config|
 
 	choco install -y netcat
 	choco install -y nmap
+	choco install -y procexp
   POWERSHELL
 
 end
