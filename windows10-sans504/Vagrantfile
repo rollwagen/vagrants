@@ -14,17 +14,28 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.network "public_network"
 
   config.vm.provision "shell", inline: <<-POWERSHELL
 	Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))	
 
+	# general tools / editors
 	choco install -y firefox
 	choco install -y putty
 	choco install -y vscode
 
+	# network
 	choco install -y netcat
 	choco install -y nmap
+
 	choco install -y procexp
+	
+	# recon
+	### takes looong..also installs dotnet3.5:  choco install -y foca
+
+	# scanning
+	#### choco install -y inssider
+
   POWERSHELL
 
 end
