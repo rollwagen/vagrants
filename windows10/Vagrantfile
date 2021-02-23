@@ -1,0 +1,28 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# export PATH=$PATH:/Applications/VMware\ OVF\ Tool
+# vagrant up --provider=vmware_esxi
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "windows_10"
+
+  config.vm.provider "vmware_desktop" do |vmware|
+    vmware.vmx["displayname"] = "Windows 10"
+    vmware.memory = 4096
+    vmware.cpus = 2
+    vmware.gui = true
+    vmware.vmx['svga.graphicsMemoryKB'] = '524288'
+  end
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provision "shell", inline: <<-POWERSHELL
+	Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))	
+
+	choco install -y firefox
+
+  POWERSHELL
+
+end
