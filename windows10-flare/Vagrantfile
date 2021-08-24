@@ -1,0 +1,36 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# export PATH=$PATH:/Applications/VMware\ OVF\ Tool
+# vagrant up --provider=vmware_esxi
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "windows_10"
+
+  config.vm.provider "vmware_desktop" do |vmware|
+    vmware.vmx["displayname"] = "Windows FLARE Workstation"
+    vmware.memory = 2048 
+    vmware.cpus = 2
+    vmware.gui = true
+  end
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provision "shell", inline: "Set-ExecutionPolicy Unrestricted -Scope CurrentUser"
+  config.vm.provision "shell", path: "https://raw.githubusercontent.com/fireeye/flare-vm/master/install.ps1", args: "-password vagrant"
+
+  #  Provider (esxi) settings
+  config.vm.provider :vmware_esxi do |esxi|
+
+    esxi.esxi_hostname = '192.168.1.14'
+    esxi.esxi_username = 'root'
+    esxi.esxi_password = 'prompt:'
+
+    esxi.guest_name = 'Windows FLARE Workstation'
+
+    esxi.guest_custom_vmx_settings = [['svga.vramSize','268435456']]
+
+  end
+
+end
