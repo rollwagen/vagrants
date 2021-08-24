@@ -1,0 +1,53 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# export PATH=$PATH:/Applications/VMware\ OVF\ Tool
+# vagrant up --provider=vmware_esxi
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "windows_10"
+
+  config.vm.provider "vmware_desktop" do |vmware|
+    vmware.vmx["displayname"] = "Windows CTF Workstation"
+    vmware.memory = 4096 
+    vmware.cpus = 2
+    vmware.gui = true
+  end
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provision "shell", inline: <<-POWERSHELL
+	Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))	
+
+	choco install -y firefox
+	choco install -y putty
+	choco install -y vscode
+
+	choco install -y netcat
+	choco install -y nmap
+	
+	# Microsoft Office (Trial version accepted)
+	# Wireshark
+	# Process Monitor from System Internals Toolkit
+	# Fiddler Classic
+	choco install -y procexp
+	choco install -y fiddler
+	choco install -y wireshark
+        choco install -y microsoft-office-deployment
+  POWERSHELL
+
+  #  Provider (esxi) settings
+  config.vm.provider :vmware_esxi do |esxi|
+
+    esxi.esxi_hostname = '192.168.1.14'
+    esxi.esxi_username = 'root'
+    esxi.esxi_password = 'prompt:'
+
+    esxi.guest_name = 'Windows CTF Workstation'
+
+    esxi.guest_custom_vmx_settings = [['svga.vramSize','268435456']]
+
+  end
+
+end
