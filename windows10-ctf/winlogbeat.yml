@@ -1,0 +1,36 @@
+winlogbeat.event_logs:
+  - name: Application
+    ignore_older: 72h
+  - name: Security
+  - name: System
+  - name: Microsoft-windows-sysmon/Operational
+    ignore_older: 72h
+
+fields:
+  logzio_codec: json
+  token: <TOKEN>
+  type: wineventlog
+  
+fields_under_root: true
+
+processors:
+  - rename:
+      fields:
+      - from: "agent"
+        to: "beat_agent"
+      ignore_missing: true
+  - rename:
+      fields:
+      - from: "log.file.path"
+        to: "source"
+      ignore_missing: true
+  - rename:
+      fields:
+      - from: "log"
+        to: "log_information"
+      ignore_missing: true
+
+output.logstash:
+  hosts: ["listener-eu.logz.io:5015"]
+  ssl:
+    certificate_authorities: ['C:\ProgramData\chocolatey\lib\winlogbeat\tools\COMODORSADomainValidationSecureServerCA.crt']
