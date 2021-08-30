@@ -28,7 +28,26 @@ Vagrant.configure("2") do |config|
     choco install -y wireshark
     choco install -y procexp
     choco install -y fiddler
+    choco install -y processhacker
+    choco install -y notepadplusplus
+    choco install -y winlogbeat
+    choco install -y sysmon
+
+    Invoke-WebRequest https://raw.githubusercontent.com/logzio/public-certificates/master/AAACertificateServices.crt -Outfile 'C:\\ProgramData\\chocolatey\\lib\\winlogbeat\\tools\\COMODORSADomainValidationSecureServerCA.crt'
   POWERSHELL
+
+  # Configure sysmon
+  config.vm.provision "shell", inline: <<-POWERSHELL
+    Invoke-WebRequest https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml -Outfile "C:\\ProgramData\\chocolatey\\lib\\sysmon\\tools\\sysmonconfig-export.xml"
+    sysmon.exe -accepteula -i "C:\\ProgramData\\chocolatey\\lib\\sysmon\\tools\\sysmonconfig-export.xml"
+  POWERSHELL
+  
+  # Configure and start Winlogbeat
+  config.vm.provision "file", source: "winlogbeat.yml", destination: "C:\\ProgramData\\chocolatey\\lib\\winlogbeat\\tools\\"
+  config.vm.provision "shell", inline: "Restart-Service winlogbeat"
+
+  # ProcDOT install zip on desktop (pwd: procdot)
+  config.vm.provision "shell", inline: 'Invoke-WebRequest "https://www.procdot.com/download/procdot/binaries/procdot_1_22_57_windows.zip" -OutFile "C:\\Users\\vagrant\\procdot_1_22_57_windows.zip"'
 
   #  Provider (esxi) settings
   config.vm.provider :vmware_esxi do |esxi|
